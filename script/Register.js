@@ -1,18 +1,24 @@
-class Record {
-    constructor(){}
+class Register extends Main{
+
+    constructor(){
+        super()
+        this.table1 = null;
+
+    }
 
     DisplayRecords(tableElem){
+        let self = this;
 
         $.ajax({
-            url: "php/controllers/Record/Records.php",
+            url: "php/controllers/Register/Records.php",
             method: "POST",
             data: {},
             datatype: "json",
             success: function(response){
 
-                // console.log(response);
+                console.log(response);
 
-                var table = new Tabulator(tableElem, {
+                self.table1 = new Tabulator(tableElem, {
                     data: response.data,
                     pagination: "local",
                     paginationSize: 10,
@@ -21,10 +27,15 @@ class Record {
                     ajaxURL: "your_data_endpoint_here.json",
                     layout: "fitDataFill",
                     columns: [
-                        {title: "ID", field: "RID", headerFilter: "input"},
-                        {title: "DESCRIPTION", field: "DESCRIPTION", headerFilter: "input"},
+                        {title: "ID", field: "RID", headerFilter: "input", visible: false,},
+                        {title: "DESCRIPTION", field: "JOB_ORDER", headerFilter: "input"},
+                        {title: "MOLD CODE", field: "MOLD_CODE", headerFilter: "input"},
+                        {title: "CONTROL#", field: "CONTROL_NO", headerFilter: "input"},
+                        {title: "TYPE", field: "TYPE", headerFilter: "input"},
+                        {title: "ISSUED DATE", field: "ISSUED_DATE", headerFilter: "input"},
+                        {title: "ISSUED TIME", field: "ISSUED_TIME", headerFilter: "input"},
                         {title: "CREATED AT", field: "CREATED_AT", headerFilter: "input"},
-                        {title: "ACTION", field:"RID", width: 300, hozAlign: "left", headerSort: false, frozen:true, formatter:function(cell){
+                        {title: "ACTION", field:"RID", hozAlign: "left", headerSort: false, frozen:true, formatter:function(cell){
                             let id = cell.getValue();
                             let edit = '<button class="btn btn-primary btn-minier btnEditRecord" value="'+id+'">Edit</button>';
                             let remove = '<button class="btn btn-danger btn-minier btnRemoveRecord" value="'+id+'">Remove</button>';
@@ -39,6 +50,43 @@ class Record {
             },
         });
     }
+    PopulateMoldCode(selectElem, selectedCode){
+        let list = JSON.parse(localStorage.getItem(this.lsMoldList));
+        var options = '<option value="">-Select-</option>';
+    
+        for (var i = 0; i < list.length; i++) {
+            let selected = "";
+
+            if(selectedCode != undefined && selectedCode == list[i].MOLD_CTRL){
+                selected = "selected";
+            }
+
+            options += '<option value="' + list[i].MOLD_CTRL + '" '+selected+'>' + list[i].MOLD_CTRL + ' | ' + list[i].ITEM_CODE + ' | ' + list[i].ITEM_NAME + '</option>';
+        }
+        
+        
+        selectElem.html(options);
+
+        selectElem.select2({
+            placeholder: 'Select Mold',
+            
+        });
+
+    }
+    PopulateType(selectElem, selectedID){
+
+
+    }
+
+
+
+
+
+
+
+
+
+
     SetRecord(record){
         $.ajax({
             url: "php/controllers/Record/GetRecord.php",
@@ -172,6 +220,7 @@ class Record {
                             },
                         })
                     }
+                    
                 },
                 error: function(err){
                     console.log("Error:"+JSON.stringify(err));
@@ -218,7 +267,5 @@ class Record {
                 this.DisplayRecords(record.table); 
             }
         })
-
     }
-
 }

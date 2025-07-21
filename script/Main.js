@@ -4,6 +4,7 @@ class Main {
     constructor(){
         this.systemLocalStorageTitle = "template";
         this.lsEmployeeList = this.systemLocalStorageTitle +"-employee-list";
+        this.lsMoldList = this.systemLocalStorageTitle +"-mold-list";
 
     }
 
@@ -16,6 +17,21 @@ class Main {
 
         // Outputs something like: 2024-05-29
         return formattedDate;
+    }
+    GetCurrentTime(){
+        // Create a new Date object
+        let now = new Date();
+    
+        // Get the current hours, minutes, and seconds
+        let hours = now.getHours();
+        let minutes = now.getMinutes();
+        let seconds = now.getSeconds();
+    
+        // Format the time as HH:MM:SS
+        let currentTime = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    
+        return currentTime; // Output: current time in HH:MM:SS format
+    
     }
 
     GetPhilippinesDateTime(){
@@ -75,7 +91,7 @@ class Main {
             data: {},
             datatype: "json",
             success: function(response){
-                console.log(response);
+                // console.log(response);
                 let list = response.data;
 
                 localStorage.setItem(self.lsEmployeeList, JSON.stringify(list));
@@ -110,9 +126,29 @@ class Main {
         }
     }
 
+    GetMoldRecords(){
+        let self = this;
+        $.ajax({
+            url: "php/controllers/Mold/Records.php",
+            method: "POST",
+            data: {},
+            datatype: "json",
+            success: function(response){
+                console.log(response);
+                let list = response.data;
+
+                localStorage.setItem(self.lsMoldList, JSON.stringify(list));
+            },
+            error: function(err){
+                console.log("Error:"+JSON.stringify(err));
+            },
+        });
+    }
+
 }
 
 
 let main = new Main();
 
 main.GetEmployeeRecords();
+main.GetMoldRecords();

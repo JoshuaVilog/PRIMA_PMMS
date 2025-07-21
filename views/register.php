@@ -12,22 +12,43 @@
             <div class="main-content-inner">
                 <div class="page-content">
                     <div class="page-header">
-                        <h1>Record</h1>
+                        <h1>Register</h1>
                     </div>
                     <div class="row">
                         <div class="col-xs-12 col-sm-4 pricing-box">
                             <div class="widget-box widget-color-orange">
                                 <div class="widget-header">
-                                    <h5 class="widget-title bigger lighter">List</h5>
+                                    <h5 class="widget-title bigger lighter">FORM</h5>
                                 </div>
                                 <div class="widget-body">
                                     <div class="widget-main">
                                         <div class="row">
                                             <div class="col-sm-12">
                                                 <div class="form-group">
-                                                    <label>Description:</label>
-                                                    <input type="text" class="form-control" id="txtDesc" oninput="this.value = this.value.toUpperCase()">
+                                                    <label>MOLD CODE:</label>
+                                                    <select id="selectMoldCode" class="form-control"></select>
                                                 </div>
+                                                <div class="form-group">
+                                                    <label>CONTROL #:</label>
+                                                    <input type="text" class="form-control" id="txtControlNo">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>TYPE:</label>
+                                                    <select id="selectType" class="form-control"></select>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>ISSUED DATE:</label>
+                                                    <input type="date" class="form-control" id="txtIssuedDate">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>ISSUED TIME:</label>
+                                                    <input type="time" class="form-control" id="txtIssuedTime">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>REMARKS:</label>
+                                                    <textarea id="txtRemarks" class="form-control" rows="5"></textarea>
+                                                </div>
+
                                                 <hr>
                                                 <input type="hidden" id="hiddenID">
                                                 <button class="btn btn-primary" id="btnAdd">Submit</button>
@@ -42,7 +63,7 @@
                         <div class="col-xs-12 col-sm-8 pricing-box">
                             <div class="widget-box widget-color-orange">
                                 <div class="widget-header">
-                                    <h5 class="widget-title bigger lighter">List</h5>
+                                    <h5 class="widget-title bigger lighter">LIST</h5>
                                 </div>
                                 <div class="widget-body">
                                     <div class="widget-main">
@@ -61,12 +82,13 @@
         </a>
     </div>
     <!-- JavaScript -->
-    <script src="/<?php echo $rootFolder; ?>/script/Record.js?v=<?php echo $generateRandomNumber; ?>"></script>
+    <script src="/<?php echo $rootFolder; ?>/script/Register.js?v=<?php echo $generateRandomNumber; ?>"></script>
     <script>
-        let record = new Record();
+        let register = new Register();
 
         //DISPLAY RECORDS
-        record.DisplayRecords("#table-records");
+        register.DisplayRecords("#table-records");
+        resetForm();
 
         $("#btnOpenModalAdd").click(function(){
             
@@ -131,7 +153,12 @@
 
         });
 
-        
+        function resetForm(){
+            $("#txtIssuedDate").val(main.GetCurrentDate());
+            $("#txtIssuedTime").val(main.GetCurrentTime());
+            register.PopulateMoldCode($("#selectMoldCode"));
+
+        }
 
 
     </script>

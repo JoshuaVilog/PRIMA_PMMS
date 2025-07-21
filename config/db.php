@@ -33,6 +33,21 @@ class DB {
         }
         return self::$conn;
     }
+    public static function connectionTMS() {
+        $hostname = "localhost";
+        $username = "root";
+        $password = "";
+        $database = "1_tms";
+
+        if (!self::$conn) {
+            self::$conn = new mysqli($hostname, $username, $password, $database);
+
+            if (self::$conn->connect_error) {
+                die("Connection failed: " . self::$conn->connect_error);
+            }
+        }
+        return self::$conn;
+    }
 }
 
 ?>
