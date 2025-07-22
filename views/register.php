@@ -25,30 +25,42 @@
                                         <div class="row">
                                             <div class="col-sm-12">
                                                 <div class="form-group">
-                                                    <label>MOLD CODE:</label>
+                                                    <label>
+                                                        <strong>MOLD CODE:</strong>
+                                                    </label>
                                                     <select id="selectMoldCode" class="form-control"></select>
                                                 </div>
                                                 <div class="form-group">
-                                                    <label>CONTROL #:</label>
+                                                    <label>
+                                                        <strong>CONTROL #:</strong>
+                                                    </label>
                                                     <input type="text" class="form-control" id="txtControlNo">
                                                 </div>
                                                 <div class="form-group">
-                                                    <label>TYPE:</label>
+                                                    <label>
+                                                        <strong>TYPE:</strong>
+                                                    </label>
                                                     <select id="selectType" class="form-control"></select>
                                                 </div>
                                                 <div class="form-group">
-                                                    <label>ISSUED DATE:</label>
+                                                    <label>
+                                                        <strong>ISSUED DATE:</strong>
+                                                    </label>
                                                     <input type="date" class="form-control" id="txtIssuedDate">
                                                 </div>
                                                 <div class="form-group">
-                                                    <label>ISSUED TIME:</label>
+                                                    <label>
+                                                        <strong>ISSUED TIME:</strong>
+                                                    </label>
                                                     <input type="time" class="form-control" id="txtIssuedTime">
                                                 </div>
                                                 <div class="form-group">
-                                                    <label>REMARKS:</label>
+                                                    <label>
+                                                        <strong>REMARKS:</strong>
+                                                    </label>
                                                     <textarea id="txtRemarks" class="form-control" rows="5"></textarea>
                                                 </div>
-
+                                                <input type="hidden" id="hiddenID">
                                                 <hr>
                                                 <input type="hidden" id="hiddenID">
                                                 <button class="btn btn-primary" id="btnAdd">Submit</button>
@@ -97,42 +109,64 @@
         });
         $("#btnAdd").click(function(){
 
-            record.desc = $("#txtDesc");
-            record.modal = $("#modalAdd");
-            record.table = "#table-records";
+            register.moldCode = $("#selectMoldCode");
+            register.controlNo = $("#txtControlNo");
+            register.type = $("#selectType");
+            register.issuedDate = $("#txtIssuedDate");
+            register.issuedTime = $("#txtIssuedTime");
+            register.remarks = $("#txtRemarks");
+            register.table = "#table-records";
 
-            record.InsertRecord(record);
+            register.InsertRecord(register, function(response){
+                if(response == true){
+                    resetForm();
+                }
+            });
 
         });
         $("#table-records").on("click", ".btnEditRecord", function(){
             let id = $(this).val();
 
-            record.id = id;
-            record.desc = $("#txtDesc");
-            record.modal = $("#modalEdit");
-            record.table = "#table-records";
-            record.hiddenID = $("#hiddenID");
-            record.btnAdd = $("#btnAdd");
-            record.btnCancel = $("#btnCancel");
-            record.btnUpdate = $("#btnUpdate");
+            register.id = id;
+            register.moldCode = $("#selectMoldCode");
+            register.controlNo = $("#txtControlNo");
+            register.type = $("#selectType");
+            register.issuedDate = $("#txtIssuedDate");
+            register.issuedTime = $("#txtIssuedTime");
+            register.remarks = $("#txtRemarks");
+            register.table = "#table-records";
+            register.hiddenID = $("#hiddenID");
+            register.btnAdd = $("#btnAdd");
+            register.btnCancel = $("#btnCancel");
+            register.btnUpdate = $("#btnUpdate");
 
-            record.SetRecord(record);
+            register.SetRecord(register);
         });
+        
         $("#btnUpdate").click(function(){
 
-            record.desc = $("#txtDesc");
-            record.id = $("#hiddenID");
-            record.modal = $("#modalEdit");
-            record.table = "#table-records";
-            record.btnAdd = $("#btnAdd");
-            record.btnCancel = $("#btnCancel");
-            record.btnUpdate = $("#btnUpdate");
+            register.moldCode = $("#selectMoldCode");
+            register.controlNo = $("#txtControlNo");
+            register.type = $("#selectType");
+            register.issuedDate = $("#txtIssuedDate");
+            register.issuedTime = $("#txtIssuedTime");
+            register.remarks = $("#txtRemarks");
+            register.id = $("#hiddenID");
+            register.modal = $("#modalEdit");
+            register.table = "#table-records";
+            register.btnAdd = $("#btnAdd");
+            register.btnCancel = $("#btnCancel");
+            register.btnUpdate = $("#btnUpdate");
 
             $("#btnAdd").show();
             $("#btnUpdate").hide();
             $("#btnCancel").hide();
 
-            record.UpdateRecord(record);
+            register.UpdateRecord(register, function(response){
+                if(response == true){
+                    resetForm();
+                }
+            });
         });
         $("#table-records").on("click", ".btnRemoveRecord", function(){
             let id = $(this).val();
@@ -148,8 +182,7 @@
             $("#btnAdd").show();
             $("#btnUpdate").hide();
             $("#btnCancel").hide();
-            $("#txtDesc").val("");
-            $("#hiddenID").val("");
+            resetForm();
 
         });
 
@@ -157,6 +190,10 @@
             $("#txtIssuedDate").val(main.GetCurrentDate());
             $("#txtIssuedTime").val(main.GetCurrentTime());
             register.PopulateMoldCode($("#selectMoldCode"));
+            register.PopulateType($("#selectType"));
+            $("#txtControlNo").val("");
+            $("#txtRemarks").val("");
+            $("#hiddenID").val("");
 
         }
 

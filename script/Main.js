@@ -5,6 +5,7 @@ class Main {
         this.systemLocalStorageTitle = "template";
         this.lsEmployeeList = this.systemLocalStorageTitle +"-employee-list";
         this.lsMoldList = this.systemLocalStorageTitle +"-mold-list";
+        this.lsTypeList = this.systemLocalStorageTitle +"-type-list";
 
     }
 
@@ -134,10 +135,28 @@ class Main {
             data: {},
             datatype: "json",
             success: function(response){
-                console.log(response);
+                // console.log(response);
                 let list = response.data;
 
                 localStorage.setItem(self.lsMoldList, JSON.stringify(list));
+            },
+            error: function(err){
+                console.log("Error:"+JSON.stringify(err));
+            },
+        });
+    }
+    GetTypeRecords(){
+        let self = this;
+        $.ajax({
+            url: "php/controllers/Type/Records.php",
+            method: "POST",
+            data: {},
+            datatype: "json",
+            success: function(response){
+                // console.log(response);
+                let list = response.data;
+
+                localStorage.setItem(self.lsTypeList, JSON.stringify(list));
             },
             error: function(err){
                 console.log("Error:"+JSON.stringify(err));
@@ -152,3 +171,4 @@ let main = new Main();
 
 main.GetEmployeeRecords();
 main.GetMoldRecords();
+main.GetTypeRecords();

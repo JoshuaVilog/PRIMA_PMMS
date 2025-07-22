@@ -5,7 +5,7 @@ class RegisterModel {
     
     public static function DisplayRecords() {
         $db = DB::connectionPMMS();
-        $sql = "SELECT `RID`, `JOB_ORDER`, `MOLD_CODE`, `CONTROL_NO`, `TYPE`, `ISSUED_DATE`, `ISSUED_TIME`, `REMARKS`, `CREATED_AT`, `CREATED_BY` FROM `register_masterlist` WHERE COALESCE(DELETED_AT, '') = ''";
+        $sql = "SELECT `RID`, `JOB_ORDER`, `MOLD_CODE`, `CONTROL_NO`, `TYPE`, `ISSUED_DATE`, `ISSUED_TIME`, `REMARKS`, `CREATED_AT`, `CREATED_BY` FROM `register_masterlist` WHERE COALESCE(DELETED_AT, '') = '' ORDER BY RID DESC";
         $result = $db->query($sql);
 
         $records = [];
@@ -74,9 +74,9 @@ class RegisterModel {
             '$moldCode',
             '$controlNo',
             '$type',
-            '$type',
             '$issuedDate',
             '$issuedTime',
+            '$remarks',
             '$userCode'
         )";
         return $db->query($sql);

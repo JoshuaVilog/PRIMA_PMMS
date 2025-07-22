@@ -16,7 +16,7 @@ class Register extends Main{
             datatype: "json",
             success: function(response){
 
-                console.log(response);
+                // console.log(response);
 
                 self.table1 = new Tabulator(tableElem, {
                     data: response.data,
@@ -28,7 +28,7 @@ class Register extends Main{
                     layout: "fitDataFill",
                     columns: [
                         {title: "ID", field: "RID", headerFilter: "input", visible: false,},
-                        {title: "DESCRIPTION", field: "JOB_ORDER", headerFilter: "input"},
+                        // {title: "JOB ORDER", field: "JOB_ORDER", headerFilter: "input"},
                         {title: "MOLD CODE", field: "MOLD_CODE", headerFilter: "input"},
                         {title: "CONTROL#", field: "CONTROL_NO", headerFilter: "input"},
                         {title: "TYPE", field: "TYPE", headerFilter: "input"},
@@ -40,7 +40,7 @@ class Register extends Main{
                             let edit = '<button class="btn btn-primary btn-minier btnEditRecord" value="'+id+'">Edit</button>';
                             let remove = '<button class="btn btn-danger btn-minier btnRemoveRecord" value="'+id+'">Remove</button>';
 
-                            return edit + " " + remove;
+                            return edit;
                         }},
                     ],
                 });
@@ -74,31 +74,106 @@ class Register extends Main{
 
     }
     PopulateType(selectElem, selectedID){
+        let list = JSON.parse(localStorage.getItem(this.lsTypeList));
+        var options = '<option value="">-Select-</option>';
+    
+        for (var i = 0; i < list.length; i++) {
+            let selected = "";
 
+            if(selectedID != undefined && selectedID == list[i].RID){
+                selected = "selected";
+            }
 
+            options += '<option value="' + list[i].RID + '" '+selected+'>' + list[i].TYPE_DESC + '</option>';
+        }
+        
+        selectElem.html(options);
+
+        selectElem.select2({
+            placeholder: 'Select Type',
+            
+        });
     }
+    InsertRecord(record, callback){
+        let self = this;
+        
+        if(record.moldCode.val() == "" || record.controlNo.val() == "" || record.type.val() == "" || record.issuedDate.val() == "" || record.issuedTime.val() == ""){
+            Swal.fire({
+                title: 'Incomplete Form.',
+                text: 'Please complete the form.',
+                icon: 'warning'
+            })
+        } else {
+            $.ajax({
+                url: "php/controllers/Register/InsertRecord.php",
+                method: "POST",
+                data: {
+                    moldCode: record.moldCode.val(),
+                    controlNo: record.controlNo.val(),
+                    type: record.type.val(),
+                    issuedDate: record.issuedDate.val(),
+                    issuedTime: record.issuedTime.val(),
+                    remarks: record.remarks.val(),
 
+                },
+                success: function(response){
+                    response = JSON.parse(response);
+                    console.log(response);
 
+                    if(response.status == "duplicate"){
 
+                        Swal.fire({
+                            title: 'Duplicate.',
+                            text: 'Please input an unique description.',
+                            icon: 'warning'
+                        })
+                    } else if(response.status == "success"){
+    
+                        Swal.fire({
+                            title: 'Record added successfully!',
+                            text: '',
+                            icon: 'success',
+                            confirmButtonColor: '#3085d6',
+                            confirmButtonText: 'Proceed!',
+                            timer: 2000,
+                            willClose: () => {
+                                self.DisplayRecords(record.table);
+                            },
+                        })
 
+                        callback(true);
+                    }
+                    
+                },
+                error: function(err){
+                    console.log("Error:"+JSON.stringify(err));
+                },
+            });
 
-
-
-
-
-
+            //REFRESH RECORD
+            this.DisplayRecords(record.table);
+            
+        }
+    }
     SetRecord(record){
+        let self = this;
+
         $.ajax({
-            url: "php/controllers/Record/GetRecord.php",
+            url: "php/controllers/Register/GetRecord.php",
             method: "POST",
             data: {
                 id: record.id,
             },
             datatype: "json",
             success: function(data){
-                // console.log(data);
-                record.modal.modal("show");
-                record.desc.val(data.DESCRIPTION);
+                console.log(data);
+
+                self.PopulateMoldCode(record.moldCode, data.MOLD_CODE);
+                record.controlNo.val(data.CONTROL_NO);
+                self.PopulateType(record.type, data.TYPE);
+                record.issuedDate.val(data.ISSUED_DATE);
+                record.issuedTime.val(data.ISSUED_TIME);
+                record.remarks.val(data.REMARKS);
                 record.hiddenID.val(record.id);
 
                 if(record.btnAdd != undefined || record.btnCancel != undefined || record.btnUpdate != undefined){
@@ -113,11 +188,10 @@ class Register extends Main{
             },
         });
     }
-    InsertRecord(record){
+    UpdateRecord(record, callback){
         let self = this;
-        let desc = record.desc;
         
-        if(desc.val() == ""){
+        if(record.moldCode.val() == "" || record.controlNo.val() == "" || record.type.val() == "" || record.issuedDate.val() == "" || record.issuedTime.val() == ""){
             Swal.fire({
                 title: 'Incomplete Form.',
                 text: 'Please complete the form.',
@@ -125,13 +199,20 @@ class Register extends Main{
             })
         } else {
             $.ajax({
-                url: "php/controllers/Record/InsertRecord.php",
+                url: "php/controllers/Register/UpdateRecord.php",
                 method: "POST",
                 data: {
-                    desc: desc.val(),
+                    moldCode: record.moldCode.val(),
+                    controlNo: record.controlNo.val(),
+                    type: record.type.val(),
+                    issuedDate: record.issuedDate.val(),
+                    issuedTime: record.issuedTime.val(),
+                    remarks: record.remarks.val(),
+                    id: record.id.val(),
                 },
                 success: function(response){
                     response = JSON.parse(response);
+                    console.log(response);
 
                     if(response.status == "duplicate"){
 
@@ -141,66 +222,6 @@ class Register extends Main{
                             icon: 'warning'
                         })
                     } else if(response.status == "success"){
-                        record.modal.modal("hide");
-                        record.desc.val("");
-    
-                        Swal.fire({
-                            title: 'Record added successfully!',
-                            text: '',
-                            icon: 'success',
-                            confirmButtonColor: '#3085d6',
-                            confirmButtonText: 'Proceed!',
-                            timer: 2000,
-                            willClose: () => {
-                                self.DisplayRecords(record.table);
-                            },
-                        })
-                    }
-                    
-                },
-                error: function(err){
-                    console.log("Error:"+JSON.stringify(err));
-                },
-            });
-
-            //REFRESH RECORD
-            this.DisplayRecords(record.table);
-            
-        }
-    }
-    UpdateRecord(record){
-        let self = this;
-        let desc = record.desc;
-        let id = record.id;
-        
-        if(desc.val() == ""){
-            Swal.fire({
-                title: 'Incomplete Form.',
-                text: 'Please complete the form.',
-                icon: 'warning'
-            })
-        } else {
-            $.ajax({
-                url: "php/controllers/Record/UpdateRecord.php",
-                method: "POST",
-                data: {
-                    desc: desc.val(),
-                    id: id.val(),
-                },
-                success: function(response){
-                    response = JSON.parse(response);
-
-                    if(response.status == "duplicate"){
-
-                        Swal.fire({
-                            title: 'Duplicate.',
-                            text: 'Please input an unique description.',
-                            icon: 'warning'
-                        })
-                    } else if(response.status == "success"){
-
-                        record.modal.modal("hide");
-                        record.desc.val("");
 
                         if(record.btnAdd != undefined || record.btnCancel != undefined || record.btnUpdate != undefined){
                             record.btnAdd.show();
@@ -217,6 +238,7 @@ class Register extends Main{
                             timer: 2000,
                             willClose: () => {
                                 self.DisplayRecords(record.table);
+                                callback(true)
                             },
                         })
                     }
@@ -231,41 +253,6 @@ class Register extends Main{
             this.DisplayRecords(record.table);
         }
     }
-    RemoveRecord(record){
-        let self = this;
-        Swal.fire({
-            title: 'Are you sure you want to remove the record?',
-            icon: 'question',
-            confirmButtonText: 'Yes',
-            showCancelButton: true,
-          }).then((result) => {
-            if (result.isConfirmed) {
-                $.ajax({
-                    url: 'php/controllers/Record/RemoveRecord.php', // Replace with your server-side script URL
-                    type: 'POST',
-                    data: {
-                        id: record.id,
-                    },
-                    success: function(response) {
-                        // console.log(response);
 
-                        self.DisplayRecords(record.table);
-                        Swal.fire({
-                            title: 'Record removed successfully!',
-                            text: '',
-                            icon: 'success',
-                            confirmButtonColor: '#3085d6',
-                            confirmButtonText: 'Proceed!',
-                            timer: 2000,
-                            willClose: () => {
-                                // window.location.href = "dashboard";
-                            },
-                        })
-            
-                    }
-                });  
-                this.DisplayRecords(record.table); 
-            }
-        })
-    }
+
 }
