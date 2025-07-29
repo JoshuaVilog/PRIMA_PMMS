@@ -17,6 +17,20 @@ class RegisterModel {
 
         return $records;
     }
+    public static function DisplayRecordsUndone() {
+        $db = DB::connectionPMMS();
+        $sql = "SELECT `RID`, `JOB_ORDER`, `MOLD_CODE`, `CONTROL_NO`, `TYPE`, `ISSUED_DATE`, `ISSUED_TIME`, `REMARKS`, `STATUS`, `CREATED_AT`, `CREATED_BY` FROM `register_masterlist` WHERE COALESCE(DELETED_AT, '') = '' AND STATUS != '1' ORDER BY RID DESC";
+        $result = $db->query($sql);
+
+        $records = [];
+        if ($result && $result->num_rows > 0) {
+            while ($row = $result->fetch_assoc()) {
+                $records[] = $row;
+            }
+        }
+
+        return $records;
+    }
 
     public static function GetRecord($id){
         $db = DB::connectionPMMS();
